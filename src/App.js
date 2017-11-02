@@ -1,11 +1,11 @@
-import React, { Component } from 'react';
+import React, { Component, PureComponent } from 'react';
 import './App.css';
 
 class App extends Component {
   constructor() {
     super()
     this.state = {
-      result: "",
+      result: "default",
       formInput: ""
     }
     this.clearState = this.clearState.bind(this)
@@ -50,14 +50,22 @@ class App extends Component {
   }
 
   render() {
+    let display
+    if (this.state.result === 'default') {
+      display = <p></p>
+    }
+    else {
+      display = this.state.result ? <MainWindow content={this.state.result} /> : <Wait />
+    }
+
     return (
       <div className="App">
         <h1>Wikipedia viewer</h1>
-        <SearchForm value={this.state.formInput} newQuery={this.newQuery} handleWriting={this.handleWriting}/>
-        <RandomButton newQuery={this.newQuery}/>
-        {this.state.result ? <MainWindow content={this.state.result}/> : <Wait/> }
+        <SearchForm value={this.state.formInput} newQuery={this.newQuery} handleWriting={this.handleWriting} />
+        <RandomButton newQuery={this.newQuery} />
+        {display}
       </div>
-    );
+    )
   }
 }
 
@@ -65,8 +73,8 @@ class SearchForm extends Component {
   render() {
     return (
       <form onSubmit={this.props.newQuery}>
-        <input type="text" value={this.props.value} onChange={this.props.handleWriting}/>
-        <input type="submit" />
+        <input type="text" value={this.props.value} onChange={this.props.handleWriting} />
+        <input type="submit" value="Submit"/>
       </form>
     )
   }
@@ -83,46 +91,37 @@ class RandomButton extends Component {
 }
 
 class Wait extends Component {
+  // Displayed during API call
   render() {
-    return (
-      <div>
-        Please wait while your query is processed
-      </div>
-    )
+    return <div className="loader"></div>
   }
 }
+
 class Result extends Component {
   render() {
     let data = this.props.data
     if (!data) {
-      return (
-        <p>No results found.</p>
-      )
+      return <p>No results found.</p>
     }
     let items = Object.keys(data).map(
       (i) =>
-      <div>
+      <div key={i}>
         <a href={'https://en.wikipedia.org/?curid=' + data[i].pageid}><h2>{data[i].title}</h2></a>
         <p>{data[i].pageId}{data[i].extract}</p>
       </div>
     )
-    return (
-        <div>{items}</div>
-    )
+    return <div className='result'>{items}</div>
   }
-}
-class MainWindow extends Component {
 
+}
+class MainWindow extends PureComponent {
   render() {
-    console.log('rendering mainWindow component.')
     let result = ""
     let flag = this.props.content.query || false
     if (flag) {
       result = flag.pages
     }
-    return (
-        <Result data={result} />
-    )
+    return <div><Result data={result} /></div>
   }
 }
 
