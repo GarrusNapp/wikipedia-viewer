@@ -57,7 +57,6 @@ class App extends Component {
     else {
       display = this.state.result ? <MainWindow content={this.state.result} /> : <Wait />
     }
-
     return (
       <div className="App">
         <h1>Wikipedia viewer</h1>
@@ -112,8 +111,8 @@ class Result extends Component {
     )
     return <div className='result'>{items}</div>
   }
-
 }
+
 class MainWindow extends PureComponent {
   render() {
     let result = ""
